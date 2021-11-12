@@ -76,6 +76,7 @@ title!("PRCP-ANOMALY")
 using TimeSeries 
 using Dates
 using Statistics
+
 dates = Date(2021,10,21): Day(1) : Date(2021, 10, 29)
 data = Vector{Int64}
 n1 = findall(x-> x == Date(2021,10,21), df.DATE)[1]
@@ -83,8 +84,26 @@ n2 = findall(x-> x == Date(2021,10,29), df.DATE)[1]
 data = df.PRCP[n1:n2]
 dset_slice = TimeArray(dates, data)
 dset_all = TimeArray(df.DATE, df.PRCP)
+#' could read CSV into TimeArray Directly
 file = TimeArray(CSV.File("HartfordAirport1942_2021.csv"), timestamp = :DATE)
+#' when could index the specific date in the timearray such as Monday or the month of October 
 when(file, dayofweek, 1)
-collapse(dset_slice, month, last, mean)
+#' try indexing two months at a time but failed; when function could only indexing one type of month at one time and there is a quarter option 
+#' From and to; Could specify the starting date and ending date of the dates 
+from(file, Date(2001, 12, 27))
+to(file, Date(2001, 12, 27))
+
+dset_PRCP = TimeArray(df.DATE, df.PRCP)
+#' collapse could compress data into a larger time frame, for example, could convert daily data into monthly data. And it could also combine with the functions in the Statistics Pkg to apply functions to the TimeArray
+collapse(dset_PRCP, month, last, )
 
 df.AWND[findall(x-> x == Date(2021,5,31), df.DATE)[1]]
+#' testing whether the mean is right or not
+n3 = findall(x-> x == Date(2021,05,01), df.DATE)[1]
+n4 = findall(x-> x == Date(2021,05,31), df.DATE)[1]
+mean(df.PRCP[n3:n4])
+#' works well with the monthly mean
+plot(dset_slice)
+plot!(size=(1200,800))
+
+#'shortcomings: can not do skipmissing or dropmissing to the TimeArray dataset
