@@ -1,7 +1,11 @@
 using CSV, DataFrames
 using Plots, Dates, Statistics
+<<<<<<< HEAD
 cd("/Users/hushixiong/Documents/STAT5125-Project/")
 df = CSV.read("HartfordAirport1942_2021.csv", DataFrame)
+=======
+df = CSV.read("Project/HartfordAirport1942_2021.csv", DataFrame)
+>>>>>>> c2d05f8398e9243a638acf83962d413fc847eb77
 
 #AWND - Average wind speed
 #SNOW - Snowfall
@@ -68,6 +72,7 @@ c4 = comparison_plot("TMIN")
 l = @layout [a b ; c d]
 plot(c1,c2,c3,c4, layout = l ,size = (700, 400))
 
+<<<<<<< HEAD
 year_mean_PRCP = mean(filter(!isnan, df_yearmean.PRCP))
 p = plot(df_yearmean.YEAR, (df_yearmean[!,:PRCP] .- year_mean_PRCP), leg = false)
 title!("PRCP-ANOMALY")
@@ -88,3 +93,14 @@ when(file, dayofweek, 1)
 collapse(dset_slice, month, last, mean)
 
 df.AWND[findall(x-> x == Date(2021,5,31), df.DATE)[1]]
+=======
+#comparison_plot("SNWD") not useful
+#comparison_plot("AWND")
+#comparison_plot("TAVG")
+
+
+
+
+
+
+>>>>>>> c2d05f8398e9243a638acf83962d413fc847eb77
