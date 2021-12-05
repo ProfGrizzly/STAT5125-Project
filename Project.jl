@@ -1,8 +1,9 @@
 using CSV, DataFrames
 using Plots, Dates, Statistics
-cd("/Users/hushixiong/Documents/STAT5125-Project/")
+cd("/Users/teddy/Documents/UCONN/Courses/STAT5125/STAT5125-Project/")
 df = CSV.read("HartfordAirport1942_2021.csv", DataFrame)
-
+dftest = CSV.read("test.csv", DataFrame)
+tatest = TimeArray(CSV.file("test.csv"), timestamp=:DATE)
 #AWND - Average wind speed
 #SNOW - Snowfall
 #TMAX - Maximum temperature
@@ -17,6 +18,20 @@ df.YEAR = Dates.year.(df.DATE)
 df.DAYOFWEEK = Dates.dayofweek.(df.DATE)
 df_notmissing = dropmissing(df) #complete data from 2000 on
 
+dfsmall = df_notmissing[24:35,2:4]
+dfsmall.MONTH = Dates.month.(dfsmall.DATE)
+dfsmall.YEAR = Dates.year.(dfsmall.DATE)
+dfsmall.DAYOFWEEK = Dates.dayofweek.(dfsmall.DATE)
+dfsmall_monthmean = groupby_mean(dfsmall, :MONTH)
+
+plot(dfsmall.DATE,dfsmall.AWND)
+tasmall = TimeArray(dfsmall,timestamp=:DATE)
+collapse(tasmall, month, first, mean)
+
+tasmall[Date(2000, 12, 24):Day(1):Date(2000, 12, 27)]
+using CSV
+TimeArray(CSV.File(filename), timestamp = :timestamp)
+when(tasmall, dayofweek, 7)
 #best function ever, calculate mean grouped by column
 function groupby_mean(dataframe, column)
     numcols = names(dataframe, findall(x -> eltype(x) <: Union{Missing,Number}, eachcol(dataframe)))

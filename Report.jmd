@@ -1,0 +1,86 @@
+# TimeSeries Report STAT5125
+## Shixiong HU, Theodor Mayer
+
+### Time Series Data
+Introduction
+Problems with DataFrames
+
+### Data
+Introduction to Hartford Data
+
+### TimeSeries Package
+4 fields
+Basic functionality with examples
+from Data
+(Indexing, split by conditions,
+apply, combine, plot)
+
+```julia
+using CSV, DataFrames
+using Plots, Dates, Statistics
+using TimeSeries 
+df = CSV.read("HartfordAirport1942_2021.csv", DataFrame)[!,Not("STATION")]
+df.YEAR = Dates.year.(df.DATE)
+
+tmp = 1
+```
+### Showing some Plots
+
+Comment on what we are doing
+```julia
+df_old = df[((df.YEAR .>= 1949) .& (df.YEAR .< 1979)),:] #wind speed, TAVG missing
+df_new = df[((df.YEAR .>= 1991) .& (df.YEAR .< 2021)),:] #most SNWD, half TAVG, third SNOW missing
+df_old = dropmissing(df_old[!,["DATE","PRCP","SNOW","SNWD","TMAX","TMIN"]])
+df_new = dropmissing(df_new[!,["DATE","AWND","PRCP","TMAX","TMIN"]])
+ta_old = TimeArray(df_old, timestamp=:DATE)
+ta_new = TimeArray(df_new, timestamp=:DATE)
+
+ta_old_monthmean = collapse(ta_old, month, first, mean)
+ta_new_monthmean = collapse(ta_new, month, first, mean)
+ta_old_yearmean = collapse(ta_old, year, first, mean)
+ta_new_yearmean = collapse(ta_new, year, first, mean)
+
+b1 = plot(ta_old_monthmean.PRCP, label="Monthly Mean (1949-1978)",
+xlab="Date", ylab="Precipitation[mm]", linewidth=0.2)
+plot!(ta_new_monthmean.PRCP,label="Monthly Mean (1991-2020)",linewidth=0.2)
+plot!(ta_old_yearmean.PRCP,label="Yearly Mean (1949-1978)")
+plot!(ta_new_yearmean.PRCP,label="Yearly Mean (1991-2020)") 
+
+b2 = plot(values(ta_old_yearmean.PRCP),label="Yearly Mean (1949-1978)",
+xlab="Years", ylab="Precipitation[mm]")
+plot!(values(ta_new_yearmean.PRCP),label="Yearly Mean (1991-2020)",
+leg=:topleft)
+
+l = @layout [a ; b]
+plot(b1, b2, layout = l ,dpi=300,size = (800, 600), plot_title = "Monthly and Yearly Precipitation Average")
+```
+
+```julia
+ta_old_monthmean_moved= moving(mean,ta_old_monthmean,10)
+ta_new_monthmean_moved= moving(mean,ta_new_monthmean,10)
+
+b1 = plot(ta_old_monthmean_moved[:TMIN,:TMAX],
+xlab="Date", ylab="Temperature [°C]", linewidth=0.2, leg=false)
+plot!(ta_new_monthmean_moved[:TMIN,:TMAX],linewidth=0.2)
+plot!(ta_old_yearmean[:TMIN,:TMAX])
+plot!(ta_new_yearmean[:TMIN,:TMAX]) 
+
+b2 = plot(values(ta_old_yearmean[:TMIN]), label="Yearly Mean (1949-1978)",
+xlab ="Years",ylab="Temperature [°C]", title = "Yearly Minimum Temperature Average")
+plot!(values(ta_new_yearmean[:TMIN]),label="Yearly Mean (1991-2020)")
+hline!(values(mean(ta_old_yearmean.TMIN)),label="30 year Mean (1949-1978)")
+hline!(values(mean(ta_new_yearmean.TMIN)),label="30 year Mean (1991-2020)"
+,leg=:bottomright)
+
+l = @layout [a ; b]
+plot(b1, b2, layout = l ,dpi=300,size = (800, 600), plot_title = "Monthly and Yearly Temperature Average")
+```
+
+### Conclusion
+
+
+
+```julia; eval=false; echo=false
+using Weave
+weave("/Users/teddy/Documents/UCONN/Courses/STAT5125/hw05-ProfGrizzly/hw05.jmd", informat="markdown", out_path="/Users/teddy/Documents/UCONN/Courses/STAT5125/hw05-ProfGrizzly/", doctype="github")
+```
