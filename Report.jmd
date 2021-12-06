@@ -22,7 +22,6 @@ using TimeSeries
 df = CSV.read("HartfordAirport1942_2021.csv", DataFrame)[!,Not("STATION")]
 df.YEAR = Dates.year.(df.DATE)
 
-tmp = 1
 ```
 ### Showing some Plots
 
